@@ -1,8 +1,0 @@
-<!--
-  Used for visualising ultrasound in action.  
-
- -->
-<launch>
-
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find viz_sonar)/rviz/sonar_rosserial.rviz" />
-</launch>
