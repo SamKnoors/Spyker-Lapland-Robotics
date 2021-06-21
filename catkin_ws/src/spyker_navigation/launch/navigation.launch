@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<launch>
+
+ <!-- arguments -->
+    <arg name="saved_map" default="false"/>
+    <arg name="odom_topic" default="zed2/zed_node/odom"/>
+
+    
+<!-- only needed if using premade map -->
+    <group if="$(arg saved_map)">
+        <!--- Run AMCL --> 
+        <include file="$(find amcl)/examples/amcl_omni.launch" />
+        <param name="odom_frame_id" value="zed2/zed_node/odom"/>
+    </group>
+    
+    
+ <!-- Run the map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find spyker_navigation)/map.yaml"/>
+	<param name="frame_id" value="/map"/>
+	
+    
+ <!-- Run move_base -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find spyker_navigation)/params/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+    <rosparam file="$(find spyker_navigation)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find spyker_navigation)/params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find spyker_navigation)/params/global_costmap_params.yaml" command="load" /> 
+    <!-- <rosparam file="$(find spyker_navigation)/params/base_local_planner_params.yaml" command="load" /> -->
+    <rosparam file="$(find spyker_navigation)/params/move_base_params.yaml" command="load" />
+    <rosparam file="$(find spyker_navigation)/params/dwa_local_planner_params.yaml" command="load" />
+  
+    <remap from="odom" to="$(arg odom_topic)" />
+ </node>
+
+ 
+ <!-- Run rviz -->
+    <node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(find spyker_navigation)/rviz/test.rviz"/>
+ 
+</launch> 
+ 
